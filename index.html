@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown Calendar</title>
+<title>Dark Mode Countdown Calendar</title>
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -14,20 +14,17 @@
     align-items: center;
     padding: 30px;
   }
-
   h1 {
     font-size: 2.2rem;
     margin-bottom: 25px;
     color: #ffffff;
   }
-
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 50px);
     gap: 8px;
     margin-bottom: 30px;
   }
-
   .day {
     width: 50px;
     height: 50px;
@@ -40,29 +37,25 @@
     color: #b0b0b0;
     transition: background 0.3s, color 0.3s;
   }
-
   .day.past {
     background: #2c2c2c;
     color: #5a5a5a;
   }
-
   .day.current {
     background: #3a8ee6;
     color: #fff;
     box-shadow: 0 0 10px rgba(58, 142, 230, 0.5);
   }
-
   .circle-container {
     display: flex;
     gap: 20px;
   }
-
   .circle {
     position: relative;
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    background: conic-gradient(#3a8ee6 0deg, #3a8ee6 0deg, #1e1e1e 0deg, #1e1e1e 360deg);
+    background: conic-gradient(#3a8ee6 0deg, #1e1e1e 0deg);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -70,7 +63,6 @@
     color: #ffffff;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   }
-
   .label {
     position: absolute;
     bottom: 8px;
@@ -82,9 +74,7 @@
 <body>
 
 <h1>30-Day Countdown</h1>
-
 <div class="calendar" id="calendar"></div>
-
 <div class="circle-container">
   <div class="circle" id="hoursCircle"><span id="hours">0</span><div class="label">Hours</div></div>
   <div class="circle" id="minutesCircle"><span id="minutes">0</span><div class="label">Minutes</div></div>
@@ -92,8 +82,11 @@
 </div>
 
 <script>
-  const startDate = new Date();
-  const countdownDate = new Date();
+  // Fixed start date — month is zero-based (7 = August)
+  const startDate = new Date(2025, 7, 16);
+  
+  // End date is 30 days after start
+  const countdownDate = new Date(startDate);
   countdownDate.setDate(countdownDate.getDate() + 30);
 
   function buildCalendar() {
@@ -109,7 +102,8 @@
 
   function updateCalendar() {
     const now = new Date();
-    const diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+    let diffDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+    diffDays = Math.max(0, Math.min(diffDays, 29)); // Clamp 0–29
     const dayElements = document.querySelectorAll('.day');
     dayElements.forEach((day, index) => {
       day.classList.remove('past', 'current');
@@ -121,7 +115,6 @@
   function updateClockUI() {
     const now = new Date().getTime();
     const distance = countdownDate - now;
-
     if (distance < 0) return;
 
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -132,9 +125,12 @@
     document.getElementById("minutes").innerText = minutes;
     document.getElementById("seconds").innerText = seconds;
 
-    document.getElementById("hoursCircle").style.background = `conic-gradient(#3a8ee6 ${(hours/24)*360}deg, #1e1e1e 0deg)`;
-    document.getElementById("minutesCircle").style.background = `conic-gradient(#3a8ee6 ${(minutes/60)*360}deg, #1e1e1e 0deg)`;
-    document.getElementById("secondsCircle").style.background = `conic-gradient(#3a8ee6 ${(seconds/60)*360}deg, #1e1e1e 0deg)`;
+    document.getElementById("hoursCircle").style.background =
+      `conic-gradient(#3a8ee6 ${(hours / 24) * 360}deg, #1e1e1e 0deg)`;
+    document.getElementById("minutesCircle").style.background =
+      `conic-gradient(#3a8ee6 ${(minutes / 60) * 360}deg, #1e1e1e 0deg)`;
+    document.getElementById("secondsCircle").style.background =
+      `conic-gradient(#3a8ee6 ${(seconds / 60) * 360}deg, #1e1e1e 0deg)`;
   }
 
   buildCalendar();
@@ -143,6 +139,5 @@
     updateClockUI();
   }, 1000);
 </script>
-
 </body>
 </html>
